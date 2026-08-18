@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+
+  <title>Ardiyan</title>
+
+  <!-- اتصال به Telegram Mini App -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap');
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      font-family: Vazirmatn, Tahoma, sans-serif;
+      background:
+        linear-gradient(
+          rgba(2, 6, 15, 0.35),
+          rgba(2, 6, 15, 0.35)
+        ),
+        url("background.jpg") center / cover no-repeat,
+        #030711;
+    }
+
+    .container {
+      min-height: 100vh;
+      padding: 25px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo {
+      direction: ltr;
+      margin-top: 5px;
+      margin-bottom: 36px;
+      color: white;
+      font-family: Georgia, serif;
+      font-size: 48px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-shadow:
+        0 0 5px white,
+        0 0 15px #bfdfff,
+        0 3px 5px black;
+    }
+
+    .logo::before {
+      content: "✦";
+      display: block;
+      text-align: center;
+      font-size: 23px;
+      line-height: 18px;
+      margin-bottom: 5px;
+    }
+
+    .logo::after {
+      content: "";
+      display: block;
+      width: 145px;
+      height: 2px;
+      margin: 8px auto 0;
+      background: linear-gradient(
+        to right,
+        transparent,
+        white,
+        transparent
+      );
+      box-shadow: 0 0 8px white;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 310px;
+      min-height: 300px;
+      padding: 28px 16px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+
+      border: 1px solid rgba(180, 220, 255, 0.8);
+      border-radius: 25px;
+
+      background: linear-gradient(
+        145deg,
+        rgba(20, 48, 80, 0.75),
+        rgba(3, 10, 23, 0.9)
+      );
+
+      box-shadow:
+        inset 0 0 25px rgba(110, 190, 255, 0.3),
+        0 0 15px rgba(100, 190, 255, 0.8),
+        0 0 35px rgba(0, 100, 255, 0.3);
+
+      backdrop-filter: blur(5px);
+    }
+
+    .card::before {
+      content: "✦";
+      position: absolute;
+      top: 8px;
+      color: #d8e8f7;
+      font-size: 17px;
+      text-shadow: 0 0 8px white;
+    }
+
+    .card::after {
+      content: "✦";
+      position: absolute;
+      bottom: 7px;
+      color: #d8e8f7;
+      font-size: 17px;
+      text-shadow: 0 0 8px white;
+    }
+
+    .welcome-text {
+      margin: 8px 0 15px;
+      color: white;
+      text-align: center;
+      font-size: 25px;
+      line-height: 1.8;
+      font-weight: 800;
+      text-shadow: 0 2px 5px black;
+    }
+
+    .orange {
+      color: #ff4b19;
+      text-shadow:
+        0 0 7px rgba(255, 70, 20, 0.8),
+        0 2px 4px black;
+    }
+
+    .hint {
+      margin-bottom: 20px;
+      padding: 7px 14px;
+      color: #222;
+      font-size: 13px;
+      border: 1px solid #e7edf3;
+      border-radius: 13px;
+      background: linear-gradient(#ffffff, #bfc8d0);
+      box-shadow:
+        inset 0 1px 2px white,
+        0 2px 5px rgba(0, 0, 0, 0.7);
+    }
+
+    .confirm-button {
+      width: 220px;
+      height: 53px;
+      border: 2px solid #42aaff;
+      border-radius: 14px;
+
+      color: white;
+      font-family: inherit;
+      font-size: 27px;
+      font-weight: 800;
+
+      background: linear-gradient(
+        #17458e,
+        #075dcf 50%,
+        #062c7c
+      );
+
+      box-shadow:
+        inset 0 0 13px rgba(65, 205, 255, 0.9),
+        0 0 7px #1598ff,
+        0 0 18px #087eff;
+
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .confirm-button:active {
+      transform: scale(0.94);
+      filter: brightness(1.3);
+    }
+
+    .footer {
+      margin-top: auto;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+
+    <div class="logo">
+      ARDIYAN
+    </div>
+
+    <section class="card">
+      <div class="welcome-text">
+        درود به بازی<br />
+        <span class="orange">آردیان</span> خوش آمدید.
+      </div>
+
+      <div class="hint">
+        لطفاً نام خود را انتخاب کنید.
+      </div>
+
+      <button class="confirm-button" id="confirmButton">
+        تأیید
+      </button>
+    </section>
+
+    <div class="footer">
+      ARDIYAN GAME
+    </div>
+
+  </main>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    const confirmButton = document.getElementById("confirmButton");
+
+    // آماده‌سازی مینی‌اپ
+    tg.ready();
+    tg.expand();
+
+    // تنظیم رنگ محیط تلگرام
+    tg.setHeaderColor("#030711");
+    tg.setBackgroundColor("#030711");
+
+    confirmButton.addEventListener("click", function () {
+      // اطلاعاتی که به ربات ارسال می‌شود
+      const data = {
+        action: "start_game",
+        time: new Date().toISOString()
+      };
+
+      // ارسال اطلاعات به ربات
+      tg.sendData(JSON.stringify(data));
+
+      // اگر خواستی بعد از کلیک بسته شود:
+      // tg.close();
+    });
+  </script>
+</body>
+</html>
