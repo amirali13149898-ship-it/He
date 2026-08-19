@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>آردیان | ورود به بازی</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --fire-1:#ffe082; --fire-2:#ffab24; --fire-3:#ff6a00; --fire-4:#e03600;
+      --ice-2:#4da6ff;
+    }
+    *{ margin:0; padding:0; box-sizing:border-box; }
+    html, body{
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      background:#000;
+      font-family:'Vazirmatn', Tahoma, Arial, sans-serif;
+    }
+
+    .screen{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      opacity:0;
+      visibility:hidden;
+      transition:opacity 0.45s ease, visibility 0.45s ease;
+      z-index:1;
+    }
+    .screen.active{
+      opacity:1;
+      visibility:visible;
+      z-index:10;
+    }
+
+    #nameScreen{
+      display:grid;
+      place-items:center;
+      background:#020204;
+      background-image:url('ardiyan-bg.jpg');
+      background-size:cover;
+      background-position:center top;
+      background-repeat:no-repeat;
+      padding:16px 18px;
+      overflow-x:hidden;
+    }
+
+    .stage{ position:relative; width:min(320px, 78vw); }
+
+    .card{
+      position:relative;
+      z-index:0;
+      border-radius:28px;
+      padding:7px;
+      background:
+        linear-gradient(90deg,  rgba(96,180,255,.95), rgba(16,22,32,0) 44%),
+        linear-gradient(270deg, rgba(255,138,32,.95), rgba(16,22,32,0) 44%),
+        linear-gradient(180deg, #10131b, #05060a);
+    }
+    .card::before{
+      content:"";
+      position:absolute; inset:-3px;
+      border-radius:32px;
+      pointer-events:none;
+      z-index:-1;
+      box-shadow:
+        -18px 0 40px -6px rgba(70,165,255,.65),
+        0 -16px 32px -12px rgba(95,182,255,.45),
+        0 18px 32px -14px rgba(70,165,255,.30);
+      animation:icePulse 5s ease-in-out infinite;
+    }
+    .card::after{
+      content:"";
+      position:absolute; inset:-3px;
+      border-radius:32px;
+      pointer-events:none;
+      z-index:-1;
+      box-shadow:
+        18px 0 40px -6px rgba(255,120,20,.65),
+        0 18px 34px -12px rgba(255,120,20,.50),
+        0 -14px 30px -14px rgba(255,120,20,.45);
+      animation:fireFlicker 3.4s ease-in-out infinite;
+    }
+    @keyframes icePulse{ 0%,100%{opacity:.85} 50%{opacity:1} }
+    @keyframes fireFlicker{
+      0%,100%{opacity:.85} 12%{opacity:1} 27%{opacity:.76}
+      41%{opacity:.98} 60%{opacity:.82} 78%{opacity:1}
+    }
+
+    .card-inner{
+      position:relative;
+      border-radius:22px;
+      background:radial-gradient(120% 90% at 50% -10%, #10131b 0%, #06070b 45%, #030305 100%);
+      box-shadow:inset 0 0 50px rgba(0,0,0,.85);
+      padding:22px 18px 20px;
+      overflow:hidden;
+    }
+    .card-inner::after{
+      content:"";
+      position:absolute; inset:0;
+      border-radius:inherit;
+      pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity:.05;
+      mix-blend-mode:screen;
+    }
+
+    .ornament{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+    }
+    .o-line{
+      height:1.5px;
+      width:clamp(50px, 18vw, 90px);
+      border-radius:2px;
+    }
+    .line-right{ background:linear-gradient(to right, rgba(216,224,238,.9), rgba(216,224,238,0)); }
+    .line-left { background:linear-gradient(to left,  rgba(216,224,238,.9), rgba(216,224,238,0)); }
+    .o-star{
+      width:18px; height:18px; flex:none;
+      filter:drop-shadow(0 0 5px rgba(205,220,245,.55));
+    }
+    .ornament.bottom{ margin-top:16px; }
+
+    .title{
+      margin:14px 0 0;
+      text-align:center;
+      font-family:'Lalezar','Vazirmatn',serif;
+      font-weight:400;
+      font-size:clamp(26px, 7vw, 34px);
+      line-height:1.25;
+      background:linear-gradient(180deg, #ffffff 5%, #e6ebf3 35%, #9aa3b4 52%, #6f7889 58%, #d7dde8 82%, #ffffff 100%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      filter:drop-shadow(0 2px 3px rgba(0,0,0,.65)) drop-shadow(0 0 14px rgba(150,190,255,.14));
+    }
+    .subtitle{
+      margin:4px 0 0;
+      text-align:center;
+      font-family:'Lalezar','Vazirmatn',serif;
+      font-weight:400;
+      font-size:clamp(16px, 4.5vw, 22px);
+      line-height:1.7;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:baseline;
+      gap:0 .3em;
+    }
+    .name{
+      display:inline-block;
+      padding:0 .05em;
+      background:linear-gradient(180deg, var(--fire-1) 0%, var(--fire-2) 38%, var(--fire-3) 68%, var(--fire-4) 100%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      filter:drop-shadow(0 0 10px rgba(255,110,0,.55)) drop-shadow(0 1px 2px rgba(0,0,0,.6));
+      animation:nameGlow 3s ease-in-out infinite;
+    }
+    @keyframes nameGlow{
+      0%,100%{ filter:drop-shadow(0 0 10px rgba(255,110,0,.55)) drop-shadow(0 1px 2px rgba(0,0,0,.6)); }
+      50%    { filter:drop-shadow(0 0 16px rgba(255,130,20,.85)) drop-shadow(0 1px 2px rgba(0,0,0,.6)); }
+    }
+    .welcome{
+      display:inline-block;
+      background:linear-gradient(180deg, #f6f8fc 10%, #c6cdda 48%, #8b93a4 60%, #e2e7f0 100%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      filter:drop-shadow(0 1px 2px rgba(0,0,0,.6)) drop-shadow(0 0 10px rgba(160,200,255,.12));
+    }
+
+    .input-box{ margin-top:18px; position:relative; }
+    .game-input{
+      width:100%;
+      height:44px;
+      border-radius:40px;
+      border:1.5px solid rgba(226,233,245,.75);
+      outline:none;
+      background:linear-gradient(180deg, #0a0c11 0%, #04050a 100%);
+      box-shadow:
+        0 0 14px rgba(190,210,245,.25),
+        0 0 3px  rgba(220,230,250,.45),
+        inset 0 3px 12px rgba(0,0,0,.85);
+      color:#eef2fa;
+      font-family:'Vazirmatn', Tahoma, sans-serif;
+      font-size:14px;
+      padding:0 18px;
+      text-align:center;
+      caret-color:#ffb347;
+      transition:box-shadow .3s ease, border-color .3s ease;
+    }
+    .game-input::placeholder{ color:rgba(180,190,210,.55); }
+    .game-input:focus{
+      border-color:#fff;
+      box-shadow:
+        0 0 20px rgba(200,220,255,.4),
+        0 0 5px  rgba(230,240,255,.55),
+        inset 0 3px 12px rgba(0,0,0,.85);
+    }
+
+    .confirm-button{
+      display:block;
+      width:100%;
+      margin-top:16px;
+      border:0;
+      padding:0;
+      background:transparent;
+      cursor:pointer;
+      transition:transform .12s ease;
+    }
+    .confirm-button svg{ display:block; width:100%; height:auto; overflow:visible; }
+    .confirm-button:hover .main-panel{ filter:brightness(1.18); }
+    .confirm-button:hover .outer-glow{ opacity:1; }
+    .confirm-button:active{ transform:scale(.97); }
+    .confirm-button.pulse svg{ animation:btnPulse .55s ease; }
+    @keyframes btnPulse{
+      0%  { filter:none; }
+      35% { filter:brightness(1.5) drop-shadow(0 0 24px rgba(255,130,20,.9)); }
+      100%{ filter:none; }
+    }
+    .button-text{
+      font-family:'Vazirmatn', Tahoma, sans-serif;
+      font-size:28px;
+      font-weight:700;
+      fill:#fff3c4;
+      text-anchor:middle;
+      dominant-baseline:middle;
+      filter:url(#text-glow);
+    }
+
+    .fx{ position:absolute; inset:0; pointer-events:none; z-index:2; }
+    .particle{
+      position:absolute;
+      border-radius:50%;
+      opacity:0;
+      animation:rise linear infinite;
+    }
+    @keyframes rise{
+      0%  { transform:translateY(0); opacity:0; }
+      15% { opacity:var(--o, .5); }
+      80% { opacity:calc(var(--o, .5) * .6); }
+      100%{ transform:translateY(var(--dy, -200px)); opacity:0; }
+    }
+
+    .toast{
+      position:fixed;
+      right:50%;
+      bottom:34px;
+      transform:translate(50%, 20px);
+      background:linear-gradient(180deg, #191c24, #0b0d12);
+      border:1px solid rgba(255,150,50,.55);
+      box-shadow:0 0 26px rgba(255,120,20,.35), inset 0 0 18px rgba(0,0,0,.6);
+      color:#ffe9c9;
+      font-size:16px;
+      padding:14px 28px;
+      border-radius:16px;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .35s ease, transform .35s ease;
+      z-index:50;
+      max-width:88vw;
+      text-align:center;
+    }
+    .toast.show{ opacity:1; transform:translate(50%, 0); }
+
+    #raceScreen{ background:#000; }
+    .game-container {
+      position:relative;
+      width:100%;
+      height:100%;
+      background-image:url('castle-background.jpg');
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      transition:background-image 0.4s ease;
+    }
+
+    .race-panel {
+      position:absolute;
+      top:12%;
+      right:3%;
+      width:32%;
+      max-width:230px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:6px;
+      padding:8px;
+      background:rgba(0, 0, 0, 0.75);
+      border:2.5px solid #d4af37;
+      border-radius:14px;
+      box-shadow:0 0 15px rgba(212, 175, 55, 0.6);
+      z-index:20;
+    }
+
+    .race-btn {
+      background:linear-gradient(145deg, #f5f0e1, #e8dcc8);
+      border:1.8px solid #c9a227;
+      border-radius:8px;
+      padding:8px 4px;
+      font-size:13px;
+      font-weight:bold;
+      color:#2c1e0f;
+      text-align:center;
+      cursor:pointer;
+      transition:all 0.2s ease;
+      min-height:42px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .race-btn:active{ transform:scale(0.95); }
+    .race-btn.selected{
+      background:linear-gradient(145deg, #ffe08a, #f0c040);
+      border-color:#ff9900;
+      box-shadow:0 0 12px #ffaa00;
+      color:#1a0f00;
+    }
+
+    .gender-box {
+      position:absolute;
+      bottom:14%;
+      left:50%;
+      transform:translateX(-50%);
+      display:none;
+      gap:12px;
+      z-index:25;
+    }
+    .gender-btn {
+      width:110px;
+      padding:10px 0;
+      background:linear-gradient(145deg, #f5f0e1, #e8dcc8);
+      border:2px solid #c9a227;
+      border-radius:10px;
+      font-size:15px;
+      font-weight:bold;
+      color:#2c1e0f;
+      cursor:pointer;
+      transition:all 0.2s;
+    }
+    .gender-btn.selected{
+      background:linear-gradient(145deg, #ffe08a, #f0c040);
+      border-color:#ff9900;
+      box-shadow:0 0 12px #ffaa00;
+    }
+
+    .race-confirm-btn {
+      position:absolute;
+      bottom:4%;
+      left:50%;
+      transform:translateX(-50%);
+      width:50%;
+      max-width:240px;
+      padding:11px 18px;
+      background:linear-gradient(90deg, #8b4513, #d2691e, #8b4513);
+      border:2.5px solid #ffd700;
+      border-radius:40px;
+      color:#fff8dc;
+      font-size:17px;
+      font-weight:bold;
+      cursor:pointer;
+      box-shadow:0 0 18px rgba(255, 180, 0, 0.7);
+      z-index:30;
+    }
+    .race-confirm-btn:disabled{
+      opacity:0.45;
+      cursor:not-allowed;
+    }
+
+    .player-name-badge{
+      position:absolute;
+      top:10px;
+      left:12px;
+      background:rgba(0,0,0,0.7);
+      border:1.5px solid #d4af37;
+      color:#ffe08a;
+      padding:6px 14px;
+      border-radius:20px;
+      font-size:13px;
+      font-weight:600;
+      z-index:40;
+      max-width:55%;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="screen active" id="nameScreen">
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <linearGradient id="starGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0"   stop-color="#f4f7fc"/>
+          <stop offset=".55" stop-color="#b9c2d4"/>
+          <stop offset="1"   stop-color="#6d7688"/>
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <div class="stage">
+      <div class="fx" id="fx"></div>
+
+      <div class="card">
+        <div class="card-inner">
+
+          <div class="ornament">
+            <span class="o-line line-right"></span>
+            <svg class="o-star" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 0C12.9 7.2 15.6 10.3 24 12 15.6 13.7 12.9 16.8 12 24 11.1 16.8 8.4 13.7 0 12 8.4 10.3 11.1 7.2 12 0Z" fill="url(#starGrad)"/>
+            </svg>
+            <span class="o-line line-left"></span>
+          </div>
+
+          <h1 class="title">درود به بازی</h1>
+          <p class="subtitle"><span class="name">آردیان</span><span class="welcome">خوش آمدید.</span></p>
+
+          <div class="input-box">
+            <input id="gameInput" class="game-input" type="text" autocomplete="off" placeholder="لطفا نام خود را وارد کنید..." maxlength="20">
+          </div>
+
+          <button id="nameConfirmBtn" class="confirm-button" type="button">
+            <svg viewBox="0 0 520 190" role="img" aria-labelledby="btnTitle">
+              <title id="btnTitle">تأیید</title>
+              <defs>
+                <linearGradient id="panelGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%"   stop-color="#ff8a1e"/>
+                  <stop offset="45%"  stop-color="#a52d05"/>
+                  <stop offset="100%" stop-color="#4c1004"/>
+                </linearGradient>
+                <linearGradient id="borderGradient" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"   stop-color="#fff078"/>
+                  <stop offset="25%"  stop-color="#ff9c19"/>
+                  <stop offset="60%"  stop-color="#ff4d00"/>
+                  <stop offset="100%" stop-color="#ffd05a"/>
+                </linearGradient>
+                <filter id="outer-glow" x="-50%" y="-100%" width="200%" height="300%">
+                  <feGaussianBlur stdDeviation="7" result="blur"/>
+                  <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+                <filter id="text-glow" x="-50%" y="-100%" width="200%" height="300%">
+                  <feGaussianBlur stdDeviation="4" result="blur"/>
+                  <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <path class="outer-glow"
+                d="M48 20 L472 20 L493 42 L486 60 L500 95 L486 130 L493 148 L472 170
+                   L48 170 L27 148 L34 130 L20 95 L34 60 L27 42 Z"
+                fill="none" stroke="#ff6500" stroke-width="7"
+                opacity=".75" filter="url(#outer-glow)"/>
+
+              <path class="main-panel"
+                d="M55 25 L465 25 L485 45 L478 63 L490 95 L478 127 L485 145 L465 165
+                   L55 165 L35 145 L42 127 L30 95 L42 63 L35 45 Z"
+                fill="url(#panelGradient)" stroke="url(#borderGradient)"
+                stroke-width="4" filter="url(#outer-glow)"/>
+
+              <path
+                d="M65 37 L455 37 L472 53 L465 70 L476 95 L465 120 L472 137 L455 153
+                   L65 153 L48 137 L55 120 L44 95 L55 70 L48 53 Z"
+                fill="none" stroke="#ffbd43" stroke-width="2" opacity=".9"/>
+
+              <path d="M83 30 H437 M83 160 H437"
+                    stroke="#ffe26b" stroke-width="2" opacity=".6"/>
+
+              <text x="260" y="98" class="button-text">تأیید</text>
+            </svg>
+          </button>
+
+          <div class="ornament bottom">
+            <span class="o-line line-right"></span>
+            <svg class="o-star" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 0C12.9 7.2 15.6 10.3 24 12 15.6 13.7 12.9 16.8 12 24 11.1 16.8 8.4 13.7 0 12 8.4 10.3 11.1 7.2 12 0Z" fill="url(#starGrad)"/>
+            </svg>
+            <span class="o-line line-left"></span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="raceScreen">
+    <div class="game-container" id="gameContainer">
+
+      <div class="player-name-badge" id="playerNameBadge">ماجراجو</div>
+
+      <div class="race-panel">
+        <button class="race-btn" data-race="انسان">انسان</button>
+        <button class="race-btn" data-race="دروف">دروف</button>
+        <button class="race-btn" data-race="نیمه انسان">نیمه انسان</button>
+        <button class="race-btn" data-race="نیمه دارگون">نیمه دارگون</button>
+        <button class="race-btn" data-race="الف">الف</button>
+        <button class="race-btn" data-race="فرشته">فرشته</button>
+      </div>
+
+      <div class="gender-box" id="genderBox">
+        <button class="gender-btn" data-gender="زن">زن</button>
+        <button class="gender-btn" data-gender="مرد">مرد</button>
+      </div>
+
+      <button class="race-confirm-btn" id="raceConfirmBtn" disabled>تأیید</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script>
+    let playerName = '';
+    let selectedRace = null;
+    let selectedGender = null;
+
+    const nameScreen = document.getElementById('nameScreen');
+    const raceScreen = document.getElementById('raceScreen');
+    const input = document.getElementById('gameInput');
+    const nameConfirmBtn = document.getElementById('nameConfirmBtn');
+    const toast = document.getElementById('toast');
+    let toastTimer;
+
+    function showToast(msg, duration = 2800) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
+    function goToRaceScreen() {
+      nameScreen.classList.remove('active');
+      setTimeout(() => {
+        raceScreen.classList.add('active');
+        document.getElementById('playerNameBadge').textContent = playerName;
+      }, 300);
+    }
+
+    function confirmName() {
+      const name = input.value.trim();
+      if (!name) {
+        showToast('لطفاً نام خود را وارد کنید');
+        input.focus();
+        return;
+      }
+      if (name.length < 2) {
+        showToast('نام باید حداقل ۲ حرف باشد');
+        return;
+      }
+
+      playerName = name;
+      localStorage.setItem('ardiyan_playerName', playerName);
+
+      nameConfirmBtn.classList.remove('pulse');
+      void nameConfirmBtn.offsetWidth;
+      nameConfirmBtn.classList.add('pulse');
+
+      showToast('درود ' + playerName + '! در حال ورود به دنیای آردیان...');
+      
+      setTimeout(goToRaceScreen, 1600);
+    }
+
+    nameConfirmBtn.addEventListener('click', confirmName);
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') confirmName();
+    });
+
+    const fx = document.getElementById('fx');
+    const COUNT = 16;
+    for (let i = 0; i < COUNT; i++) {
+      const p = document.createElement('span');
+      p.className = 'particle';
+      const fire = i % 2 === 0;
+      const size = (2 + Math.random() * 3).toFixed(1);
+
+      if (fire) {
+        p.style.left = (78 + Math.random() * 18) + '%';
+        p.style.top  = (50 + Math.random() * 40) + '%';
+        p.style.background = 'radial-gradient(circle, #ffd9a0, #ff7a1a)';
+        p.style.boxShadow  = '0 0 8px rgba(255,130,30,.8)';
+      } else {
+        p.style.left = (3 + Math.random() * 16) + '%';
+        p.style.top  = (8 + Math.random() * 38) + '%';
+        p.style.background = 'radial-gradient(circle, #eaf6ff, #58b1ff)';
+        p.style.boxShadow  = '0 0 8px rgba(90,180,255,.8)';
+      }
+
+      p.style.width  = size + 'px';
+      p.style.height = size + 'px';
+      p.style.setProperty('--o',  (0.35 + Math.random() * 0.4).toFixed(2));
+      p.style.setProperty('--dy', '-' + Math.round(160 + Math.random() * 180) + 'px');
+      p.style.animationDuration = (4 + Math.random() * 5).toFixed(2) + 's';
+      p.style.animationDelay    = (-Math.random() * 6).toFixed(2) + 's';
+      fx.appendChild(p);
+    }
+
+    const raceButtons = document.querySelectorAll('.race-btn');
+    const genderButtons = document.querySelectorAll('.gender-btn');
+    const genderBox = document.getElementById('genderBox');
+    const raceConfirmBtn = document.getElementById('raceConfirmBtn');
+    const gameContainer = document.getElementById('gameContainer');
+
+    const raceImages = {
+      "انسان": "human.jpg",
+      "دروف": "dwarf.jpg",
+      "نیمه انسان": "half-human.jpg",
+      "نیمه دارگون": "half-dragon.jpg",
+      "الف": "elf.jpg",
+      "فرشته": "angel.jpg"
+    };
+
+    raceButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        raceButtons.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedRace = btn.getAttribute('data-race');
+
+        gameContainer.style.backgroundImage = `url('${raceImages[selectedRace]}')`;
+
+        genderBox.style.display = 'flex';
+        selectedGender = null;
+        genderButtons.forEach(b => b.classList.remove('selected'));
+        raceConfirmBtn.disabled = true;
+      });
+    });
+
+    genderButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        genderButtons.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedGender = btn.getAttribute('data-gender');
+        raceConfirmBtn.disabled = false;
+      });
+    });
+
+    raceConfirmBtn.addEventListener('click', () => {
+      if (selectedRace && selectedGender) {
+        localStorage.setItem('ardiyan_race', selectedRace);
+        localStorage.setItem('ardiyan_gender', selectedGender);
+
+        showToast(`${playerName} | نژاد: ${selectedRace} | جنسیت: ${selectedGender}`);
+        
+        console.log({
+          name: playerName,
+          race: selectedRace,
+          gender: selectedGender
+        });
+      }
+    });
+
+    if (window.Telegram && Telegram.WebApp) {
+      Telegram.WebApp.ready();
+      Telegram.WebApp.expand();
+      try {
+        Telegram.WebApp.setHeaderColor('#0a0a0f');
+        Telegram.WebApp.setBackgroundColor('#0a0a0f');
+      } catch(e) {}
+    }
+  </script>
+</body>
+                    </html>
