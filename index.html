@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>وقایع‌نگاری اِلدوریا | نسخه آزمایشی</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+    <!-- صفحه لودینگ -->
+    <div id="loading-screen" class="screen active">
+      <div class="loader">
+        <div class="sword">⚔️</div>
+        <h1>اِلدوریا</h1>
+        <p>در حال بارگذاری سرزمین جادویی...</p>
+        <div class="progress-bar"><div class="progress"></div></div>
+      </div>
+    </div>
+
+    <!-- صفحه انتخاب کلاس -->
+    <div id="class-select-screen" class="screen">
+      <div class="header">
+        <h1>⚔️ انتخاب کلاس</h1>
+        <p>مسیرت را انتخاب کن، ماجراجو!</p>
+      </div>
+      <div class="class-grid">
+        <div class="class-card" data-class="warrior">
+          <div class="class-icon">🛡️</div>
+          <h3>جنگجو</h3>
+          <p>قدرت بدنی بالا، دفاع قوی</p>
+          <ul>
+            <li>❤️ HP: ۱۵۰</li>
+            <li>⚔️ قدرت: ۲۵</li>
+            <li>🛡️ دفاع: ۲۰</li>
+          </ul>
+        </div>
+        <div class="class-card" data-class="mage">
+          <div class="class-icon">🔮</div>
+          <h3>جادوگر</h3>
+          <p>آسیب جادویی بالا، مانای زیاد</p>
+          <ul>
+            <li>❤️ HP: ۱۰۰</li>
+            <li>✨ قدرت جادو: ۳۰</li>
+            <li>💧 مانا: ۱۲۰</li>
+          </ul>
+        </div>
+        <div class="class-card" data-class="necromancer">
+          <div class="class-icon">💀</div>
+          <h3>نکرومانسر</h3>
+          <p>احضار مردگان، آسیب تاریک</p>
+          <ul>
+            <li>❤️ HP: ۱۱۰</li>
+            <li>☠️ قدرت تاریک: ۲۸</li>
+            <li>🦴 احضار: فعال</li>
+          </ul>
+        </div>
+      </div>
+      <button id="confirm-class-btn" class="btn primary" disabled>تأیید و شروع ماجراجویی</button>
+    </div>
+
+    <!-- صفحه اصلی بازی -->
+    <div id="main-screen" class="screen">
+      <div class="top-bar">
+        <div class="player-info">
+          <span id="player-name">ماجراجو</span>
+          <span class="level">سطح <span id="player-level">1</span></span>
+        </div>
+        <div class="resources">
+          <span class="gold">💰 <span id="gold">100</span></span>
+          <span class="diamond">💎 <span id="diamond">5</span></span>
+        </div>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat">
+          <span>❤️</span>
+          <div class="bar"><div id="hp-bar" class="fill hp"></div></div>
+          <span id="hp-text">100/100</span>
+        </div>
+        <div class="stat" id="mana-stat">
+          <span>💧</span>
+          <div class="bar"><div id="mana-bar" class="fill mana"></div></div>
+          <span id="mana-text">50/50</span>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="character-display">
+          <div id="char-avatar" class="avatar">🛡️</div>
+          <div id="char-class-name">جنگجو</div>
+          <div class="xp-bar">
+            <div id="xp-fill" class="fill"></div>
+            <span id="xp-text">۰ / ۱۰۰ XP</span>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn action" data-action="explore">🗺️ اکتشاف</button>
+          <button class="btn action" data-action="battle">⚔️ مبارزه</button>
+          <button class="btn action" data-action="inventory">🎒 کوله‌پشتی</button>
+          <button class="btn action" data-action="shop">🏪 فروشگاه</button>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <button class="nav-btn active" data-tab="home">🏠</button>
+        <button class="nav-btn" data-tab="quests">📜</button>
+        <button class="nav-btn" data-tab="guild">🏰</button>
+        <button class="nav-btn" data-tab="profile">👤</button>
+      </div>
+    </div>
+
+    <!-- صفحه مبارزه -->
+    <div id="battle-screen" class="screen">
+      <div class="battle-header">
+        <h2>⚔️ نبرد</h2>
+        <button id="flee-btn" class="btn small">فرار</button>
+      </div>
+      <div class="battle-area">
+        <div class="enemy">
+          <div id="enemy-avatar" class="avatar enemy-avatar">👹</div>
+          <div id="enemy-name">گابلین</div>
+          <div class="bar"><div id="enemy-hp-bar" class="fill hp"></div></div>
+          <span id="enemy-hp-text">۸۰/۸۰</span>
+        </div>
+        <div class="vs">VS</div>
+        <div class="player-side">
+          <div id="battle-player-avatar" class="avatar">🛡️</div>
+          <div id="battle-player-name">جنگجو</div>
+          <div class="bar"><div id="battle-hp-bar" class="fill hp"></div></div>
+          <span id="battle-hp-text">۱۵۰/۱۵۰</span>
+        </div>
+      </div>
+      <div id="battle-log" class="battle-log"></div>
+      <div class="battle-actions">
+        <button class="btn battle-btn" data-skill="attack">⚔️ حمله</button>
+        <button class="btn battle-btn" data-skill="skill1">✨ مهارت ۱</button>
+        <button class="btn battle-btn" data-skill="skill2">🔥 مهارت ۲</button>
+        <button class="btn battle-btn" data-skill="heal">💊 درمان</button>
+      </div>
+    </div>
+
+    <!-- صفحه کوله‌پشتی -->
+    <div id="inventory-screen" class="screen">
+      <div class="header">
+        <h2>🎒 کوله‌پشتی</h2>
+        <button class="btn small back-btn">بازگشت</button>
+      </div>
+      <div id="inventory-list" class="item-list"></div>
+    </div>
+
+    <!-- صفحه فروشگاه -->
+    <div id="shop-screen" class="screen">
+      <div class="header">
+        <h2>🏪 فروشگاه زریک</h2>
+        <button class="btn small back-btn">بازگشت</button>
+      </div>
+      <div class="shop-items">
+        <div class="shop-item" data-item="potion">
+          <span class="item-icon">🧪</span>
+          <div class="item-info">
+            <h4>معجون درمان</h4>
+            <p>بازیابی ۵۰ HP</p>
+          </div>
+          <button class="btn small buy-btn" data-price="30">۳۰ 💰</button>
+        </div>
+        <div class="shop-item" data-item="mana_potion">
+          <span class="item-icon">💙</span>
+          <div class="item-info">
+            <h4>معجون مانا</h4>
+            <p>بازیابی ۴۰ مانا</p>
+          </div>
+          <button class="btn small buy-btn" data-price="25">۲۵ 💰</button>
+        </div>
+        <div class="shop-item" data-item="sword">
+          <span class="item-icon">🗡️</span>
+          <div class="item-info">
+            <h4>شمشیر آهنین</h4>
+            <p>+۱۰ قدرت حمله</p>
+          </div>
+          <button class="btn small buy-btn" data-price="150">۱۵۰ 💰</button>
+        </div>
+        <div class="shop-item" data-item="armor">
+          <span class="item-icon">🦺</span>
+          <div class="item-info">
+            <h4>زره چرمی</h4>
+            <p>+۱۵ دفاع</p>
+          </div>
+          <button class="btn small buy-btn" data-price="120">۱۲۰ 💰</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- مودال پیام -->
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <h3 id="modal-title">پیام</h3>
+        <p id="modal-text"></p>
+        <button id="modal-ok" class="btn primary">باشه</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
