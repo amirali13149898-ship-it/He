@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>بازی</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #000;
+      font-family: Tahoma, Arial, sans-serif;
+    }
+
+    .game-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background-image: url('castle-background.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: background-image 0.4s ease;
+    }
+
+    .race-panel {
+      position: absolute;
+      top: 12%;
+      right: 3%;
+      width: 32%;
+      max-width: 230px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 8px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 2.5px solid #d4af37;
+      border-radius: 14px;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+      z-index: 20;
+    }
+
+    .race-btn {
+      background: linear-gradient(145deg, #f5f0e1, #e8dcc8);
+      border: 1.8px solid #c9a227;
+      border-radius: 8px;
+      padding: 8px 4px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #2c1e0f;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .race-btn:active {
+      transform: scale(0.95);
+    }
+
+    .race-btn.selected {
+      background: linear-gradient(145deg, #ffe08a, #f0c040);
+      border-color: #ff9900;
+      box-shadow: 0 0 12px #ffaa00;
+      color: #1a0f00;
+    }
+
+    .gender-box {
+      position: absolute;
+      bottom: 14%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      gap: 12px;
+      z-index: 25;
+    }
+
+    .gender-btn {
+      width: 110px;
+      padding: 10px 0;
+      background: linear-gradient(145deg, #f5f0e1, #e8dcc8);
+      border: 2px solid #c9a227;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: bold;
+      color: #2c1e0f;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .gender-btn.selected {
+      background: linear-gradient(145deg, #ffe08a, #f0c040);
+      border-color: #ff9900;
+      box-shadow: 0 0 12px #ffaa00;
+    }
+
+    .confirm-btn {
+      position: absolute;
+      bottom: 4%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50%;
+      max-width: 240px;
+      padding: 11px 18px;
+      background: linear-gradient(90deg, #8b4513, #d2691e, #8b4513);
+      border: 2.5px solid #ffd700;
+      border-radius: 40px;
+      color: #fff8dc;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 18px rgba(255, 180, 0, 0.7);
+      z-index: 30;
+    }
+
+    .confirm-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-container" id="gameContainer">
+
+    <div class="race-panel">
+      <button class="race-btn" data-race="انسان">انسان</button>
+      <button class="race-btn" data-race="دروف">دروف</button>
+      <button class="race-btn" data-race="نیمه انسان">نیمه انسان</button>
+      <button class="race-btn" data-race="نیمه دارگون">نیمه دارگون</button>
+      <button class="race-btn" data-race="الف">الف</button>
+      <button class="race-btn" data-race="فرشته">فرشته</button>
+    </div>
+
+    <!-- جابه‌جا شده: زن سمت راست، مرد سمت چپ -->
+    <div class="gender-box" id="genderBox">
+      <button class="gender-btn" data-gender="زن">زن</button>
+      <button class="gender-btn" data-gender="مرد">مرد</button>
+    </div>
+
+    <button class="confirm-btn" id="confirmBtn" disabled>تأیید</button>
+  </div>
+
+  <script>
+    let selectedRace = null;
+    let selectedGender = null;
+
+    const raceButtons = document.querySelectorAll('.race-btn');
+    const genderButtons = document.querySelectorAll('.gender-btn');
+    const genderBox = document.getElementById('genderBox');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const gameContainer = document.getElementById('gameContainer');
+
+    const raceImages = {
+      "انسان": "human.jpg",
+      "دروف": "dwarf.jpg",
+      "نیمه انسان": "half-human.jpg",
+      "نیمه دارگون": "half-dragon.jpg",
+      "الف": "elf.jpg",
+      "فرشته": "angel.jpg"
+    };
+
+    raceButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        raceButtons.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedRace = btn.getAttribute('data-race');
+
+        gameContainer.style.backgroundImage = `url('${raceImages[selectedRace]}')`;
+
+        genderBox.style.display = 'flex';
+
+        selectedGender = null;
+        genderButtons.forEach(b => b.classList.remove('selected'));
+        confirmBtn.disabled = true;
+      });
+    });
+
+    genderButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        genderButtons.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedGender = btn.getAttribute('data-gender');
+        confirmBtn.disabled = false;
+      });
+    });
+
+    confirmBtn.addEventListener('click', () => {
+      if (selectedRace && selectedGender) {
+        alert(`نژاد: ${selectedRace}\nجنسیت: ${selectedGender}`);
+      }
+    });
+
+    if (window.Telegram && Telegram.WebApp) {
+      Telegram.WebApp.ready();
+      Telegram.WebApp.expand();
+    }
+  </script>
+</body>
+</html>
